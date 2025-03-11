@@ -3,7 +3,8 @@ name: Build and Test Heap Exploitation PoC
 on:
   push:
     branches:
-      - master
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
