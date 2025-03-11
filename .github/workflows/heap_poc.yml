@@ -10,13 +10,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+
+      - name: Clone how2heap repository
+        run: git clone --depth 1 https://github.com/shellphish/how2heap.git
 
       - name: List repository structure
         run: |
           echo "Repository root:"
           ls -l .
+          echo "Listing subdirectories:"
           for dir in $(find . -maxdepth 1 -type d); do
             echo "Contents of ${dir}:"
             ls -l "${dir}"
