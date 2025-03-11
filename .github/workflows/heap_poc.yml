@@ -1,16 +1,31 @@
-name: Heap Exploitation PoC
-on: [push]  # Run on every push (you can adjust events as needed)
+name: Build and Test Heap Exploitation PoC
+
+on:
+  push:
+    branches:
+      - master
+
 jobs:
-  run-heap-exploit:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner&#8203;:contentReference[oaicite:5]{index=5}
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4  # Best practice to fetch code&#8203;:contentReference[oaicite:6]{index=6}
-      - name: Install dependencies (gcc and gdb)
-        run: sudo apt-get update && sudo apt-get install -y gcc gdb  # Install needed packages&#8203;:contentReference[oaicite:7]{index=7}&#8203;:contentReference[oaicite:8]{index=8}
-      - name: Clone how2heap repository (optional if code is already present)
-        run: git clone --depth 1 https://github.com/shellphish/how2heap.git
-      - name: Compile heap exploitation PoC
-        run: gcc -o fastbin_dup how2heap/fastbin_dup.c  # Compile the PoC C file into an executable
-      - name: Execute heap exploitation PoC
-        run: ./fastbin_dup  # Run the PoC; output will be captured in the logs
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: List repository structure
+        run: |
+          echo "Repository root:"
+          ls -l .
+          for dir in $(find . -maxdepth 1 -type d); do
+            echo "Contents of ${dir}:"
+            ls -l "${dir}"
+          done
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y gcc gdb
+
+      - name: Compile fastbin_dup PoC (glibc_2.35)
+        run: gcc -o fastbin_dup how2heap/glibc_2.35/fastbin_dup.c
+
+      - name: Run PoC
+        run: ./fastbin_dup
