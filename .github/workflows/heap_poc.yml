@@ -10,25 +10,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Initialize Log File
+        run: echo "Build log for Heap Exploitation PoC" > build.log
 
       - name: Clone how2heap repository
-        run: git clone --depth 1 https://github.com/shellphish/how2heap.git
+        run: git clone --depth 1 https://github.com/shellphish/how2heap.git 2>&1 | tee -a build.log
 
       - name: List repository structure
         run: |
-          echo "Repository root:"
-          ls -l .
-          echo "Listing subdirectories:"
+          echo "Repository root:" | tee -a build.log
+          ls -l . | tee -a build.log
+          echo "Listing subdirectories:" | tee -a build.log
           for dir in $(find . -maxdepth 1 -type d); do
-            echo "Contents of ${dir}:"
-            ls -l "${dir}"
+            echo "Contents of ${dir}:" | tee -a build.log
+            ls -l "${dir}" | tee -a build.log
           done
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y gcc gdb
+        run: sudo apt-get update && sudo apt-get install -y gcc gdb 2>&1 | tee -a build.log
 
       - name: Compile fastbin_dup PoC (glibc_2.35)
-        run: gcc -o fastbin_dup how2heap/glibc_2.35/fastbin_dup.c
+        run: gcc -o fastbin_dup how2heap/glibc_2.35/fastbin_dup.c 2>&1 | tee -a build.log
 
       - name: Run PoC
-        run: ./fastbin_dup
+        run: ./fastbin_dup 2>&1 | tee -a build.log
+
+      - name: Upload Build Log Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
